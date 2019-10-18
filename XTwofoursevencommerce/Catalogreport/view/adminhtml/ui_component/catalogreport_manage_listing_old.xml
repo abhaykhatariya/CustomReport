@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <!-- Integration -->
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <!-- we define a provider -->
+            <item name="provider" xsi:type="string">catalogreport_manage_listing.catalogreport_manage_listing_data_source</item>
+            <!-- same string as above -->
+            <item name="deps" xsi:type="string">catalogreport_manage_listing.catalogreport_manage_listing_data_source</item>
+        </item>
+        
+        <!-- define column type -->
+        <item name="spinner" xsi:type="string">catalogreport_manage_columns</item>
+        
+    </argument>
+    <!-- Data source -->
+    <dataSource name="catalogreport_manage_listing_data_source">
+        <argument name="dataProvider" xsi:type="configurableObject">
+            <argument name="class" xsi:type="string">ManageGridDataProvider</argument> <!-- Data provider class -->
+            <argument name="name" xsi:type="string">catalogreport_manage_listing_data_source</argument> <!-- provider defined above -->
+            <argument name="primaryFieldName" xsi:type="string">item_id</argument> <!-- Primary key -->
+            <argument name="requestFieldName" xsi:type="string">id</argument> <!-- URL name parameter -->
+ 
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="component" xsi:type="string">Magento_Ui/js/grid/provider</item>
+                    <item name="update_url" xsi:type="url" path="mui/index/render"/>
+                    <item name="storageConfig" xsi:type="array">
+                        <!-- Primary key column name -->
+                        <item name="indexField" xsi:type="string">item_id</item>
+                    </item>
+                </item>
+            </argument>
+        </argument>
+    </dataSource>
+    
+    <!-- Container Listing Top -->
+    <container name="listing_top">
+        <argument name="data" xsi:type="array">
+            <item name="config" xsi:type="array">
+                <item name="template" xsi:type="string">ui/grid/toolbar</item>
+            </item>
+        </argument>
+        <!-- Button to manage views -->
+        <bookmark name="bookmarks">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="component" xsi:type="string">Magento_Ui/js/grid/controls/bookmarks/bookmarks</item>
+                    <item name="displayArea" xsi:type="string">dataGridActions</item>
+                    <item name="storageConfig" xsi:type="array">
+                        <item name="saveUrl" xsi:type="url" path="mui/bookmark/save"/>
+                        <item name="deleteUrl" xsi:type="url" path="mui/bookmark/delete"/>
+                        <item name="namespace" xsi:type="string">jobs_department_listing</item>
+                    </item>
+                </item>
+            </argument>
+        </bookmark>
+        <!-- Button to manage columns -->
+        <container name="columns_controls">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="columnsData" xsi:type="array">
+                        <item name="provider" xsi:type="string">catalogreport_manage_listing.catalogreport_manage_listing.catalogreport_manage_columns</item>
+                    </item>
+                    <item name="component" xsi:type="string">Magento_Ui/js/grid/controls/columns</item>
+                    <item name="displayArea" xsi:type="string">dataGridActions</item>
+                </item>
+            </argument>
+        </container>
+		
+		
+		<!-- Filters -->
+        <filters name="listing_filters">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="storageConfig" xsi:type="array">
+                        <item name="provider" xsi:type="string">catalogreport_manage_listing.catalogreport_manage_listing.listing_top.bookmarks</item>
+                        <item name="namespace" xsi:type="string">current.filters</item>
+                    </item>
+                    <item name="childDefaults" xsi:type="array">
+                        <item name="provider" xsi:type="string">catalogreport_manage_listing.catalogreport_manage_listing.listing_top.listing_filters</item>
+                        <item name="imports" xsi:type="array">
+                            <item name="visible" xsi:type="string">catalogreport_manage_listing.catalogreport_manage_listing.listing_top.bookmarks:current.columns.${ $.index }.visible</item>
+                        </item>
+                    </item>
+                </item>
+            </argument>
+            <!-- Department ID Filter -->
+            
+            <!-- Department name Filter -->
+            <filterInput name="sku">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="dataScope" xsi:type="string">name</item> <!-- Column name in DB -->
+                        <item name="label" xsi:type="string" translate="true">SKU</item> <!-- Label on grid -->
+                    </item>
+                </argument>
+            </filterInput>
+			
+        </filters>
+        
+          <!-- Paging -->
+        <paging name="listing_paging">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="storageConfig" xsi:type="array">
+                        <item name="provider" xsi:type="string">catalogreport_manage_listing.catalogreport_manage_listing.listing_top.bookmarks</item>
+                        <item name="namespace" xsi:type="string">current.paging</item>
+                    </item>
+                    <item name="selectProvider" xsi:type="string">catalogreport_manage_listing.catalogreport_manage_listing.catalogreport_manage_columns.ids</item>
+                    <item name="displayArea" xsi:type="string">bottom</item>
+                </item>
+            </argument>
+        </paging>
+		
+    </container>
+    
+    
+    <!-- Columns -->
+    <columns name="catalogreport_manage_columns">
+        <!-- Name Column -->
+        <column name="sku">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">text</item>
+                    <item name="editor" xsi:type="array">
+                        <item name="editorType" xsi:type="string">text</item>
+                        <item name="validation" xsi:type="array">
+                            <item name="required-entry" xsi:type="boolean">true</item>
+                        </item>
+                    </item>
+                    <item name="label" xsi:type="string" translate="true">SKU</item>
+                </item>
+            </argument>
+        </column>
+        
+        <column name="increment_id" class="XTwofoursevencommerce\Catalogreport\Ui\Component\Listing\Column\Quantity">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">true</item>
+                    <item name="label" xsi:type="string" translate="true">Order number</item>
+                </item>
+            </argument>
+        </column>
+		
+		<column name="customer_firstname" class="XTwofoursevencommerce\Catalogreport\Ui\Component\Listing\Column\Quantity">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">false</item>
+                    <item name="label" xsi:type="string" translate="true">Firstname</item>
+                </item>
+            </argument>
+        </column>
+        
+        <column name="customer_lastname" class="XTwofoursevencommerce\Catalogreport\Ui\Component\Listing\Column\Quantity">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">false</item>
+                    <item name="label" xsi:type="string" translate="true">Lastname</item>
+                </item>
+            </argument>
+        </column>
+		
+		<column name="customer_email" class="XTwofoursevencommerce\Catalogreport\Ui\Component\Listing\Column\Quantity">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">false</item>
+                    <item name="label" xsi:type="string" translate="true">Email</item>
+                </item>
+            </argument>
+        </column>
+		
+		<column name="weee_tax_applied_amount" class="XTwofoursevencommerce\Catalogreport\Ui\Component\Listing\Column\Quantity">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">false</item>
+                    <item name="label" xsi:type="string" translate="true">Street</item>
+                </item>
+            </argument>
+        </column>
+		<column name="weee_tax_applied_row_amount" class="XTwofoursevencommerce\Catalogreport\Ui\Component\Listing\Column\Quantity">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">false</item>
+                    <item name="label" xsi:type="string" translate="true">City</item>
+                </item>
+            </argument>
+        </column>
+		
+		<column name="weee_tax_disposition" class="XTwofoursevencommerce\Catalogreport\Ui\Component\Listing\Column\Quantity">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">false</item>
+                    <item name="label" xsi:type="string" translate="true">Postcode</item>
+                </item>
+            </argument>
+        </column>
+		
+		<column name="weee_tax_row_disposition" class="XTwofoursevencommerce\Catalogreport\Ui\Component\Listing\Column\Quantity">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">false</item>
+                    <item name="label" xsi:type="string" translate="true">Country</item>
+                </item>
+            </argument>
+        </column>
+		
+	<column name="created_at" class="XTwofoursevencommerce\Catalogreport\Ui\Component\Listing\Column\Quantity">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">false</item>
+                    <item name="label" xsi:type="string" translate="true">Ordered date</item>
+                </item>
+            </argument>
+        </column>
+		
+		<column name="status" class="XTwofoursevencommerce\Catalogreport\Ui\Component\Listing\Column\Quantity">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">false</item>
+                    <item name="label" xsi:type="string" translate="true">Status</item>
+                </item>
+            </argument>
+        </column>
+		
+		<column name="name" class="XTwofoursevencommerce\Catalogreport\Ui\Component\Listing\Column\Quantity">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">false</item>
+                    <item name="label" xsi:type="string" translate="true">Product name</item>
+                </item>
+            </argument>
+        </column>
+		<column name="qty_ordered" class="XTwofoursevencommerce\Catalogreport\Ui\Component\Listing\Column\Quantity">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">false</item>
+                    <item name="label" xsi:type="string" translate="true">Quantity</item>
+                </item>
+            </argument>
+        </column>
+		
+		<column name="discount_amount" class="XTwofoursevencommerce\Catalogreport\Ui\Component\Listing\Column\Quantity">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">false</item>
+                    <item name="label" xsi:type="string" translate="true">Discount</item>
+                </item>
+            </argument>
+        </column>
+		
+		<column name="row_total" class="XTwofoursevencommerce\Catalogreport\Ui\Component\Listing\Column\Quantity">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">false</item>
+                    <item name="label" xsi:type="string" translate="true">Row total</item>
+                </item>
+            </argument>
+        </column>
+		
+		<column name="grand_total" class="XTwofoursevencommerce\Catalogreport\Ui\Component\Listing\Column\Quantity">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="filter" xsi:type="string">false</item>
+                    <item name="label" xsi:type="string" translate="true">Grand total</item>
+                </item>
+            </argument>
+        </column>
+        
+        
+        
+    </columns>
+    
+    
+    
+</listing>

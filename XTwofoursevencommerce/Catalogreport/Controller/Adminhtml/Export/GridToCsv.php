@@ -1,0 +1,121 @@
+<?php
+
+    namespace XTwofoursevencommerce\Catalogreport\Controller\Adminhtml\Export;
+    
+    use Magento\Backend\App\Action;
+    use Magento\Backend\App\Action\Context;
+    use Magento\Framework\App\ResponseInterface;
+    use Magento\Framework\App\Filesystem\DirectoryList;
+    use Magento\Framework\Filesystem as Filesystem;
+    use Magento\Framework\Filesystem\Directory\WriteInterface;
+    use Magento\Framework\App\Response\Http\FileFactory;
+
+    class GridToCsv extends Action
+    {
+        public function execute()
+        {
+            $this->_view->loadLayout(false);
+            $fileName = "SalesReport_". date('Ymd_His').".csv";
+
+            // $exportBlock = $this->_view->getLayout()->createBlock('Twofoursevencommerce\Catalogreport\Model\Resource\Products\Collection');
+
+
+            $objectManager = \Magento\Framework\App\ObjectManager::getInstance(); 
+            $resource = $objectManager->get('Magento\Framework\App\ResourceConnection');
+            $connection = $resource->getConnection();
+            $tableName = $resource->getTableName('sales_order_item');
+
+
+            $sql = "SELECT `main_table`.*, `secondTable`.* FROM `sales_order_item` AS `main_table` LEFT JOIN `sales_order` AS `secondTable` ON main_table.order_id = secondTable.entity_id";
+            $dataSource = $connection->fetchAll($sql); 
+
+            if (isset($dataSource)) {
+                $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+                foreach ($dataSource as & $item) {
+                    $StockState = $objectManager->get('\Magento\CatalogInventory\Api\StockStateInterface');
+                    $item['type_id'] = $StockState->getStockQty($item['item_id']);
+
+                    $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+                    $resource = $objectManager->get('Magento\Framework\App\ResourceConnection');
+                    $connection = $resource->getConnection();
+                    $item_id = $item['item_id'];
+                    $order_id = $item['order_id'];
+                    $product_id = $item['product_id'];
+					$price = $item['price'];
+				    $discount = $item['base_discount_amount'];
+                $product = $objectManager->create('Magento\Catalog\Model\Product')->load($product_id);
+                $taxcode = '';
+                $galaxyPlu = $product->getGalaxyPlu();
+                $taxcode = $product->getAttributeText('tax_class_id');
+				$subTotalVal = $price + $discount;
+                if($taxcode == false){
+                    $taxcode = '';
+                }
+                $query_tax_name="select code,amount from sales_order_tax where order_id = ? limit 1";
+                $_orderCollections_tax_name = $connection->fetchAll($query_tax_name,[$order_id]);
+                $taxamount = '';
+               if(!empty($_orderCollections_tax_name)){
+                  $taxamount = $_orderCollections_tax_name[0]['amount'];
+               }                   
+                $item['sku'] = $galaxyPlu;              
+                $item['row_total'] = $taxcode;
+                $item['tax_amount'] = $taxamount;
+                $item['subtotal'] = $subTotalVal;   
+                    
+                }
+            }
+
+
+            
+
+
+            $heading = array('OrderNo', 'OrderedDate', 'GalaxyPlu ', 'Title', 'QTY', 'Price', 'TaxCode ', 'DiscountApplied ', 'Netprice', 'VAT');    
+            $handle = fopen($fileName, 'w');
+            fputcsv($handle, $heading);
+            foreach ($dataSource as $data) {
+
+             $row = [
+                 $data['increment_id'],
+                 $data['created_at'],
+                 $data['sku'],
+                 $data['name'],
+                 $data['qty_ordered'],
+                 $data['price'],
+                 $data['row_total'],
+                 $data['discount_amount'],
+                 $data['subtotal'],
+                 $data['tax_amount'],
+                 ];
+
+
+             fputcsv($handle, $row);
+            }
+            $this->downloadCsv($fileName);
+
+            // $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+            // $this->_fileFactory = $objectManager->create('Magento\Framework\App\Response\Http\FileFactory');
+            // return $this->_fileFactory->create(
+            //     $fileName,
+            //     $exportBlock->getCsvFile(),
+            //     DirectoryList::VAR_DIR
+            // );
+        }
+
+
+        public function downloadCsv($fileName)
+        {
+            if (file_exists($fileName)) {
+                 //set appropriate headers
+                 header('Content-Description: File Transfer');
+                 header('Content-Type: application/csv');
+                 header('Content-Disposition: attachment; filename='.basename($fileName));
+                 header('Expires: 0');
+                 header('Cache-Control: must-revalidate');
+                 header('Pragma: public');
+                 header('Content-Length: ' . filesize($fileName));
+                 ob_clean();flush();
+                 readfile($fileName);
+            }
+        }
+    }
+

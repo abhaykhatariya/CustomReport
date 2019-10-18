@@ -1,0 +1,25 @@
+<?php
+
+namespace XTwofoursevencommerce\Catalogreport\Model\Resource\Products;
+use Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection;
+
+class Collection extends AbstractCollection
+{
+    protected function _construct()
+    {
+        $this->_init('XTwofoursevencommerce\Catalogreport\Model\Products', 'XTwofoursevencommerce\Catalogreport\Model\Resource\Products');
+    }
+    protected function _initSelect()
+	{
+		parent::_initSelect();
+
+		$this->getSelect()->joinLeft(
+				['secondTable' => $this->getTable('sales_order')],
+				'main_table.order_id = secondTable.entity_id',
+				'*'
+			);
+		$this->addFilterToMap('increment_id', 'secondTable.increment_id');
+		//$this->addFilterToMap('columnname2_clias', 'secondTable.columnname2');
+		return $this;
+	}
+}

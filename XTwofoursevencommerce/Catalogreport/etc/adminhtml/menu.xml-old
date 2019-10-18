@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="XTwofoursevencommerce_Catalogreport::manage" title="Sales Finance Report" translate="Sales Finance Report" module="XTwofoursevencommerce_Catalogreport" sortOrder="25" parent="Magento_Reports::report_marketing" action="catalogreport/manage" resource="XTwofoursevencommerce_Catalogreport::manage"/>
+    </menu>
+</config>
