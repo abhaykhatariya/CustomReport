@@ -44,4 +44,10 @@
             <argument name="resourceModel" xsi:type="string"XTwofoursevencommerce\Catalogreport\Model\Resource\Products</argument>
         </arguments>
     </virtualType>-->
+
+    <type name="Magento\Ui\Model\Export\MetadataProvider">
+        <plugin name="xtwofoursevencommerce_export" type="XTwofoursevencommerce\Catalogreport\Plugin\ModifyExportPlugin" sortOrder="1" disabled="false"/>
+    </type>
+
+
 </config>
